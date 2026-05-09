@@ -252,6 +252,30 @@ btn.disabled=false;btn.textContent='Kirim';area.scrollTop=area.scrollHeight;
 });
 
 function escHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+
+// Checkbox strikethrough toggle
+document.addEventListener('change',function(e){
+if(e.target.type!=='checkbox')return;
+var label=e.target.closest('label');
+if(!label)return;
+var textEl=label.querySelector('span, s');
+if(!textEl)return;
+var text=textEl.textContent;
+if(e.target.checked){
+var s=document.createElement('s');
+s.textContent=text;
+s.className=textEl.className;
+s.classList.add('text-gray-400');
+s.classList.remove('text-gray-900','text-gray-800');
+textEl.replaceWith(s);
+}else{
+var span=document.createElement('span');
+span.textContent=text;
+span.className=textEl.className;
+span.classList.remove('text-gray-400');
+textEl.replaceWith(span);
+}
+});
 </script>
 </body>
 </html>
