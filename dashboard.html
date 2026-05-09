@@ -153,18 +153,14 @@ Logout
 <button onclick="openModal('txn-modal')" class="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-primary/25">+ Transaksi</button>
 </div>
 <div class="grid sm:grid-cols-3 gap-5 mb-6">
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pemasukan</p><p class="text-2xl font-extrabold text-green-600" id="fin-income">Rp1.500.000</p></div>
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pengeluaran</p><p class="text-2xl font-extrabold text-red-500" id="fin-expense">Rp650.000</p></div>
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa</p><p class="text-2xl font-extrabold text-gray-950" id="fin-balance">Rp850.000</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pemasukan</p><p class="text-2xl font-extrabold text-green-600" id="fin-income">Rp0</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pengeluaran</p><p class="text-2xl font-extrabold text-red-500" id="fin-expense">Rp0</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa</p><p class="text-2xl font-extrabold text-gray-950" id="fin-balance">Rp0</p></div>
 </div>
 <div class="bg-white rounded-2xl border border-gray-100 p-6">
 <h3 class="font-bold text-gray-950 mb-4">Transaksi Terakhir</h3>
 <div class="divide-y divide-gray-50" id="txn-list">
-<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Uang bulanan</p><p class="text-xs text-gray-400">1 Mei 2025</p></div><span class="text-sm font-bold text-green-600">+Rp1.500.000</span></div>
-<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Makan siang</p><p class="text-xs text-gray-400">2 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp25.000</span></div>
-<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Kos bulanan</p><p class="text-xs text-gray-400">3 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp500.000</span></div>
-<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Fotokopi materi</p><p class="text-xs text-gray-400">4 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp15.000</span></div>
-<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Transportasi</p><p class="text-xs text-gray-400">5 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp110.000</span></div>
+<p class="text-sm text-gray-400 py-4 text-center" id="txn-empty">Belum ada transaksi.</p>
 </div>
 </div>
 </div>
@@ -322,7 +318,7 @@ closeModal('task-modal');
 });
 
 // Add transaction
-var totalIncome=1500000,totalExpense=650000;
+var totalIncome=0,totalExpense=0;
 function fmtRp(n){return'Rp'+n.toLocaleString('id-ID');}
 function updateFinCards(){
 document.getElementById('fin-income').textContent=fmtRp(totalIncome);
@@ -343,6 +339,7 @@ var row=document.createElement('div');
 row.className='flex items-center justify-between py-3';
 row.innerHTML='<div><p class="text-sm font-medium text-gray-900">'+escHtml(name)+'</p><p class="text-xs text-gray-400">'+dateStr+'</p></div><span class="text-sm font-bold '+(isIncome?'text-green-600':'text-red-500')+'">'+(isIncome?'+':'-')+fmtRp(amount)+'</span>';
 var list=document.getElementById('txn-list');
+var empty=document.getElementById('txn-empty');if(empty)empty.remove();
 list.insertBefore(row,list.firstChild);
 document.getElementById('txn-name').value='';
 document.getElementById('txn-amount').value='';
