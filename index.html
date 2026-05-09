@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyFlow - Belajar Lebih Cerdas, Hidup Lebih Teratur</title>
+    <meta name="description" content="StudyFlow adalah asisten produktivitas belajar berbasis AI untuk mahasiswa Indonesia. Atur jadwal, kelola keuangan, dan belajar lebih efektif.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#378ADD',
+                        'primary-dark': '#2a6db8',
+                        'primary-light': '#e8f2fc',
+                        'gray-950': '#0a0f1a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse-ring { 0%{transform:scale(.9);opacity:.7} 50%{transform:scale(1);opacity:1} 100%{transform:scale(.9);opacity:.7} }
+        .float{animation:float 4s ease-in-out infinite}
+        .fade-up{animation:fadeUp .7s ease-out forwards;opacity:0}
+        .delay-100{animation-delay:.1s}
+        .delay-200{animation-delay:.2s}
+        .delay-300{animation-delay:.3s}
+        .delay-400{animation-delay:.4s}
+        .card-hover{transition:transform .3s,box-shadow .3s}
+        .card-hover:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(55,138,221,.15)}
+        .blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;pointer-events:none}
+    </style>
+</head>
+<body class="font-sans text-gray-800 bg-white antialiased overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-gray-100 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-md shadow-primary/30 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+                </div>
+                <span class="text-xl font-extrabold text-gray-950">Study<span class="text-primary">Flow</span></span>
+            </a>
+            <a href="register.html" class="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-300 shadow-md shadow-primary/25 hover:shadow-lg hover:shadow-primary/30">Mulai Gratis</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="hero" class="relative pt-32 pb-12 md:pt-44 md:pb-16 overflow-hidden">
+        <div class="blob w-[500px] h-[500px] bg-primary -top-40 -right-40 absolute"></div>
+        <div class="blob w-[400px] h-[400px] bg-blue-400 bottom-0 -left-32 absolute"></div>
+        <div class="max-w-6xl mx-auto px-5 text-center relative z-10">
+            <div class="inline-flex items-center gap-2 bg-primary-light text-primary text-sm font-semibold px-4 py-1.5 rounded-full mb-6 fade-up">
+                <span class="w-2 h-2 bg-primary rounded-full" style="animation:pulse-ring 2s infinite"></span>
+                AI-Powered Study Assistant
+            </div>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-gray-950 leading-tight mb-6 fade-up delay-100">
+                Belajar Lebih Cerdas,<br>
+                <span class="text-primary">Hidup Lebih Teratur</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 fade-up delay-200">
+                Asisten AI yang bantu kamu atur jadwal belajar, kelola keuangan, dan dapatkan tips studi personal — semua dalam satu aplikasi.
+            </p>
+            <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-5 fade-up delay-300">
+                <input type="email" id="email-input" required placeholder="Masukkan email kamu..." class="flex-1 px-5 py-3.5 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm transition-all">
+                <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-semibold px-7 py-3.5 rounded-full transition-all duration-300 shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 text-sm whitespace-nowrap">Gabung Waitlist</button>
+            </form>
+            <div id="success-msg" class="hidden mb-5 text-green-600 font-semibold text-sm fade-up">Terima kasih! Kamu sudah terdaftar di waitlist.</div>
+            <p class="text-sm text-gray-400 fade-up delay-400">Bergabung dengan <span class="font-bold text-gray-600">200+ mahasiswa</span> yang sudah mendaftar</p>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20 md:py-28 bg-gray-50/60">
+        <div class="max-w-6xl mx-auto px-5">
+            <div class="text-center mb-16">
+                <p class="text-primary font-semibold text-sm uppercase tracking-wider mb-3">Fitur Unggulan</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-950">Semua yang kamu butuhkan,<br>dalam satu tempat</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 card-hover">
+                    <div class="w-16 h-16 bg-blue-200 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-950 mb-3">AI Jadwal Belajar</h3>
+                    <p class="text-gray-500 leading-relaxed">AI otomatis buatkan jadwal belajar optimal berdasarkan jadwal kuliah dan gaya belajar kamu.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 card-hover">
+                    <div class="w-16 h-16 bg-green-200 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-950 mb-3">Expense Tracker</h3>
+                    <p class="text-gray-500 leading-relaxed">Catat dan pantau pengeluaran harian kamu supaya uang bulanan nggak cepat habis.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 card-hover">
+                    <div class="w-16 h-16 bg-purple-200 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-950 mb-3">AI Study Tips</h3>
+                    <p class="text-gray-500 leading-relaxed">Dapatkan tips belajar personal dari AI yang disesuaikan dengan kebutuhan dan mata kuliah kamu.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="how-it-works" class="py-20 md:py-28">
+        <div class="max-w-6xl mx-auto px-5">
+            <div class="text-center mb-16">
+                <p class="text-primary font-semibold text-sm uppercase tracking-wider mb-3">Cara Kerja</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-950">Mulai dalam 3 langkah mudah</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 relative">
+                <div class="hidden md:block absolute top-10 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-primary/40 via-primary/70 to-primary/40" style="left:16%;right:16%;height:2px"></div>
+                <!-- Step 1 -->
+                <div class="text-center relative">
+                    <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-extrabold mx-auto mb-6 shadow-lg shadow-primary/30 relative z-10">1</div>
+                    <h3 class="text-lg font-bold text-gray-950 mb-2">Daftar Gratis</h3>
+                    <p class="text-gray-500">Buat akun dalam hitungan detik, tanpa perlu kartu kredit.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="text-center relative">
+                    <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-extrabold mx-auto mb-6 shadow-lg shadow-primary/30 relative z-10">2</div>
+                    <h3 class="text-lg font-bold text-gray-950 mb-2">Ceritakan Jadwal Kuliah</h3>
+                    <p class="text-gray-500">Input jadwal kuliah dan preferensi belajar kamu ke StudyFlow.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="text-center relative">
+                    <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-extrabold mx-auto mb-6 shadow-lg shadow-primary/30 relative z-10">3</div>
+                    <h3 class="text-lg font-bold text-gray-950 mb-2">Dapatkan Jadwal Optimal</h3>
+                    <p class="text-gray-500">AI akan buatkan jadwal belajar yang paling sesuai untuk kamu.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="py-20 md:py-28 bg-gray-50/60">
+        <div class="max-w-6xl mx-auto px-5">
+            <div class="text-center mb-16">
+                <p class="text-primary font-semibold text-sm uppercase tracking-wider mb-3">Harga</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-950">Pilih paket yang cocok buat kamu</h2>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+                <!-- Free -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-200 card-hover flex flex-col">
+                    <h3 class="text-xl font-bold text-gray-950 mb-1">Gratis</h3>
+                    <p class="text-gray-400 text-sm mb-6">Untuk yang baru mulai</p>
+                    <div class="mb-8">
+                        <span class="text-4xl font-extrabold text-gray-950">Rp0</span>
+                        <span class="text-gray-400 text-sm">/bulan</span>
+                    </div>
+                    <ul class="space-y-3 mb-8 flex-1">
+                        <li class="flex items-center gap-3 text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>5 AI query per bulan</li>
+                        <li class="flex items-center gap-3 text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Jadwal belajar dasar</li>
+                        <li class="flex items-center gap-3 text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Expense tracker</li>
+                    </ul>
+                    <a href="register.html" class="block text-center border-2 border-gray-200 hover:border-primary hover:text-primary font-semibold py-3 rounded-full transition-all duration-300 text-sm">Mulai Gratis</a>
+                </div>
+                <!-- Pro -->
+                <div class="bg-gray-950 rounded-2xl p-8 border border-gray-800 card-hover flex flex-col relative overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">POPULER</div>
+                    <h3 class="text-xl font-bold text-white mb-1">Pro</h3>
+                    <p class="text-gray-400 text-sm mb-6">Untuk yang serius berprestasi</p>
+                    <div class="mb-8">
+                        <span class="text-4xl font-extrabold text-white">Rp29.000</span>
+                        <span class="text-gray-400 text-sm">/bulan</span>
+                    </div>
+                    <ul class="space-y-3 mb-8 flex-1">
+                        <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Unlimited AI query</li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Jadwal belajar advanced</li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Expense tracker + analytics</li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>AI Study Tips personal</li>
+                    </ul>
+                    <a href="https://wa.me/628886334343?text=Halo,%20saya%20ingin%20berlangganan%20StudyFlow%20Pro" target="_blank" rel="noopener" class="block text-center bg-primary hover:bg-primary-dark text-white font-semibold py-3 rounded-full transition-all duration-300 shadow-lg shadow-primary/30 text-sm">Langganan Pro</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-gray-100">
+        <div class="max-w-6xl mx-auto px-5 text-center">
+            <p class="text-gray-400 text-sm">&copy; 2025 StudyFlow. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://vmullhzdnosjnnwgsang.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtdWxsaHpkbm9zam5ud2dzYW5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMzkwNTQsImV4cCI6MjA5MzkxNTA1NH0.OcNK92Ong-rDUKjEC-3l47B7uEJYuMViTedaDrFc2rw';
+        const { createClient } = window.supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Waitlist form
+        document.getElementById('waitlist-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var emailInput = document.getElementById('email-input');
+            var submitBtn = this.querySelector('button[type="submit"]');
+            var successMsg = document.getElementById('success-msg');
+            var email = emailInput.value.trim();
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Mengirim...';
+
+            var { error } = await supabaseClient.from('waitlist').insert({ email: email });
+
+            if (error) {
+                if (error.code === '23505') {
+                    // Duplicate email
+                    successMsg.textContent = 'Email ini sudah terdaftar sebelumnya.';
+                    successMsg.classList.remove('hidden', 'text-green-600');
+                    successMsg.classList.add('text-amber-600');
+                    submitBtn.textContent = 'Sudah Terdaftar \u2713';
+                    submitBtn.classList.remove('hover:bg-primary-dark', 'hover:shadow-xl', 'hover:shadow-primary/40');
+                    submitBtn.classList.add('bg-amber-500', 'cursor-not-allowed');
+                } else {
+                    // Other error — re-enable form
+                    successMsg.textContent = 'Terjadi kesalahan. Coba lagi nanti.';
+                    successMsg.classList.remove('hidden', 'text-green-600');
+                    successMsg.classList.add('text-red-500');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Gabung Waitlist';
+                    return;
+                }
+            } else {
+                // Success
+                successMsg.textContent = 'Kamu sudah terdaftar! Kami akan hubungi segera.';
+                successMsg.classList.remove('hidden');
+                submitBtn.textContent = 'Sudah Terdaftar \u2713';
+                submitBtn.classList.remove('hover:bg-primary-dark', 'hover:shadow-xl', 'hover:shadow-primary/40');
+                submitBtn.classList.add('bg-green-500', 'cursor-not-allowed');
+            }
+
+            emailInput.disabled = true;
+            emailInput.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        });
+
+        // Intersection Observer for fade-up animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-up').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

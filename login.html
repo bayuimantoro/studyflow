@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - StudyFlow</title>
+    <meta name="description" content="Masuk ke akun StudyFlow kamu.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#378ADD',
+                        'primary-dark': '#2a6db8',
+                        'primary-light': '#e8f2fc',
+                        'gray-950': '#0a0f1a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .fade-up { animation: fadeUp .5s ease-out forwards; }
+        .blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12;pointer-events:none}
+    </style>
+</head>
+<body class="font-sans bg-gray-50 min-h-screen flex flex-col antialiased overflow-x-hidden">
+
+    <div class="blob w-[400px] h-[400px] bg-primary -top-32 -right-32 fixed"></div>
+    <div class="blob w-[300px] h-[300px] bg-blue-400 bottom-0 -left-24 fixed"></div>
+
+    <div class="w-full max-w-md mx-auto px-5 pt-8">
+        <a href="index.html" class="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Kembali ke beranda
+        </a>
+    </div>
+
+    <main class="flex-1 flex items-center justify-center px-5 py-8">
+        <div class="w-full max-w-md fade-up">
+            <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 md:p-10">
+
+                <div class="text-center mb-8">
+                    <a href="index.html" class="inline-flex items-center gap-2 mb-5 group">
+                        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-md shadow-primary/30 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+                        </div>
+                        <span class="text-xl font-extrabold text-gray-950">Study<span class="text-primary">Flow</span></span>
+                    </a>
+                    <h1 class="text-2xl font-extrabold text-gray-950">Masuk ke Akun</h1>
+                    <p class="text-gray-400 text-sm mt-2">Selamat datang kembali!</p>
+                </div>
+
+                <div id="error-msg" class="hidden bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-6"></div>
+
+                <form id="login-form" class="space-y-5">
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+                        <input type="email" id="email" required placeholder="nama@email.com"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm transition-all">
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
+                            <a href="#" id="forgot-link" class="text-xs text-primary hover:underline">Lupa password?</a>
+                        </div>
+                        <input type="password" id="password" required placeholder="Masukkan password"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm transition-all">
+                    </div>
+                    <button type="submit" id="submit-btn"
+                        class="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 text-sm">
+                        Masuk
+                    </button>
+                </form>
+
+                <p class="text-center text-sm text-gray-400 mt-6">
+                    Belum punya akun? <a href="register.html" class="text-primary font-semibold hover:underline">Daftar gratis</a>
+                </p>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://vmullhzdnosjnnwgsang.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtdWxsaHpkbm9zam5ud2dzYW5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMzkwNTQsImV4cCI6MjA5MzkxNTA1NH0.OcNK92Ong-rDUKjEC-3l47B7uEJYuMViTedaDrFc2rw';
+        const { createClient } = window.supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const form = document.getElementById('login-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorMsg = document.getElementById('error-msg');
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMsg.classList.add('hidden');
+        }
+
+        document.getElementById('forgot-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Fitur lupa password sedang dalam pengembangan.');
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideError();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Memproses...';
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                showError('Email atau password salah.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Masuk';
+                return;
+            }
+
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+</html>

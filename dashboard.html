@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - StudyFlow</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+tailwind.config={theme:{extend:{colors:{primary:'#378ADD','primary-dark':'#2a6db8','primary-light':'#e8f2fc','gray-950':'#0a0f1a'},fontFamily:{sans:['Inter','sans-serif']}}}}
+</script>
+<style>
+.sidebar-btn{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-radius:.75rem;font-size:.875rem;font-weight:500;color:#6b7280;transition:all .2s;width:100%;text-align:left}
+.sidebar-btn:hover{background:#f3f4f6;color:#111827}
+.sidebar-btn.active{background:#e8f2fc;color:#378ADD;font-weight:600}
+.metric-card{background:#fff;border-radius:1rem;padding:1.5rem;border:1px solid #f3f4f6}
+.section{display:none}.section.active{display:block}
+.chat-bubble{padding:.75rem 1rem;border-radius:1rem;max-width:85%;font-size:.875rem;line-height:1.5}
+.chat-user{background:#378ADD;color:#fff;margin-left:auto;border-bottom-right-radius:.25rem}
+.chat-ai{background:#f3f4f6;color:#1f2937;border-bottom-left-radius:.25rem}
+</style>
+</head>
+<body class="font-sans bg-gray-50 antialiased">
+<div class="flex h-screen overflow-hidden">
+
+<!-- Mobile overlay -->
+<div id="overlay" class="fixed inset-0 bg-black/40 z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed md:static z-40 w-64 h-full bg-white border-r border-gray-100 flex flex-col -translate-x-full md:translate-x-0 transition-transform">
+<div class="p-5 border-b border-gray-100">
+<a href="index.html" class="flex items-center gap-2">
+<div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-md shadow-primary/30">
+<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+</div>
+<span class="text-lg font-extrabold text-gray-950">Study<span class="text-primary">Flow</span></span>
+</a>
+</div>
+<nav class="flex-1 p-4 space-y-1">
+<button class="sidebar-btn active" onclick="showSection('dashboard',this)">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+Dashboard
+</button>
+<button class="sidebar-btn" onclick="showSection('planner',this)">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"/></svg>
+AI Planner
+</button>
+<button class="sidebar-btn" onclick="showSection('tugas',this)">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+Tugas &amp; Jadwal
+</button>
+<button class="sidebar-btn" onclick="showSection('keuangan',this)">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"/></svg>
+Keuangan
+</button>
+</nav>
+<div class="p-4 border-t border-gray-100">
+<div class="flex items-center gap-3 mb-3 px-1">
+<div class="w-8 h-8 bg-primary-light text-primary rounded-full flex items-center justify-center text-sm font-bold" id="user-avatar">S</div>
+<div class="flex-1 min-w-0"><p class="text-sm font-semibold text-gray-900 truncate" id="user-sidebar-name">Student</p><p class="text-xs text-gray-400 truncate" id="user-sidebar-email">-</p></div>
+</div>
+<button onclick="logout()" class="sidebar-btn text-red-400 hover:bg-red-50 hover:text-red-500">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+Logout
+</button>
+</div>
+</aside>
+
+<!-- Main -->
+<div class="flex-1 flex flex-col overflow-hidden">
+<!-- Top bar -->
+<header class="bg-white border-b border-gray-100 px-5 py-4 flex items-center gap-4">
+<button onclick="toggleSidebar()" class="md:hidden text-gray-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg></button>
+<h2 class="text-lg font-bold text-gray-950" id="page-title">Dashboard</h2>
+</header>
+
+<main class="flex-1 overflow-y-auto p-5 md:p-8">
+
+<!-- DASHBOARD SECTION -->
+<div id="sec-dashboard" class="section active max-w-5xl">
+<h1 class="text-2xl font-extrabold text-gray-950 mb-1" id="greeting">Selamat datang!</h1>
+<p class="text-gray-400 text-sm mb-8">Berikut ringkasan aktivitas belajar kamu hari ini.</p>
+<div class="grid sm:grid-cols-3 gap-5 mb-8">
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Streak Belajar</p><p class="text-3xl font-extrabold text-gray-950">7 <span class="text-base font-normal text-gray-400">hari</span></p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Jam Belajar Minggu Ini</p><p class="text-3xl font-extrabold text-primary">12.5 <span class="text-base font-normal text-gray-400">jam</span></p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa Budget</p><p class="text-3xl font-extrabold text-green-600">Rp850K</p></div>
+</div>
+<div class="grid md:grid-cols-2 gap-5">
+<div class="bg-white rounded-2xl border border-gray-100 p-6">
+<h3 class="font-bold text-gray-950 mb-4">Tugas Hari Ini</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 text-sm cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span>Baca Chapter 5 Statistika</span></label>
+<label class="flex items-center gap-3 text-sm cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span>Kerjakan tugas Algoritma</span></label>
+<label class="flex items-center gap-3 text-sm cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-primary" checked><s class="text-gray-400">Review catatan Basis Data</s></label>
+</div>
+</div>
+<div class="bg-gradient-to-br from-primary to-blue-600 rounded-2xl p-6 text-white">
+<div class="flex items-center gap-2 mb-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg><h3 class="font-bold">Saran AI</h3></div>
+<p class="text-sm text-white/90 leading-relaxed">Kamu sudah belajar 2 jam hari ini. Coba istirahat 15 menit dulu, lalu lanjut dengan teknik Pomodoro untuk tugas Algoritma.</p>
+<button onclick="showSection('planner',document.querySelectorAll('.sidebar-btn')[1])" class="mt-4 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">Buka AI Planner</button>
+</div>
+</div>
+</div>
+
+<!-- AI PLANNER SECTION -->
+<div id="sec-planner" class="section max-w-3xl">
+<div class="flex items-center justify-between mb-6">
+<div><h1 class="text-2xl font-extrabold text-gray-950">AI Planner</h1><p class="text-gray-400 text-sm mt-1">Tanya AI tentang jadwal belajar, tips, atau keuangan</p></div>
+<span class="bg-primary-light text-primary text-xs font-bold px-3 py-1 rounded-full" id="query-counter">2/5 query gratis</span>
+</div>
+<div class="bg-white rounded-2xl border border-gray-100 flex flex-col" style="height:calc(100vh - 250px);min-height:400px">
+<div class="flex-1 overflow-y-auto p-5 space-y-4" id="chat-area">
+<div class="flex"><div class="chat-bubble chat-ai">Halo! Aku StudyFlow AI. Mau tanya soal jadwal belajar, tips, atau keuangan? Langsung aja.</div></div>
+</div>
+<form id="chat-form" class="p-4 border-t border-gray-100 flex gap-3">
+<input type="text" id="chat-input" placeholder="Ketik pertanyaan kamu..." required class="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm">
+<button type="submit" id="chat-btn" class="bg-primary hover:bg-primary-dark text-white px-5 py-3 rounded-xl transition-all shadow-md shadow-primary/25 text-sm font-semibold">Kirim</button>
+</form>
+</div>
+</div>
+
+<!-- TUGAS SECTION -->
+<div id="sec-tugas" class="section max-w-3xl">
+<div class="flex items-center justify-between mb-6">
+<h1 class="text-2xl font-extrabold text-gray-950">Tugas &amp; Jadwal</h1>
+<button onclick="alert('Fitur tambah tugas segera hadir!')" class="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-primary/25">+ Tambah Tugas</button>
+</div>
+<div class="space-y-6">
+<div class="bg-white rounded-2xl border border-gray-100 p-6">
+<h3 class="font-bold text-gray-950 mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-primary rounded-full"></span>Hari Ini</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Baca Chapter 5 Statistika</span><span class="text-xs text-gray-400">09:00</span></label>
+<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Kerjakan tugas Algoritma</span><span class="text-xs text-gray-400">13:00</span></label>
+<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary" checked><s class="flex-1 text-gray-400">Review catatan Basis Data</s><span class="text-xs text-gray-400">08:00</span></label>
+</div>
+</div>
+<div class="bg-white rounded-2xl border border-gray-100 p-6">
+<h3 class="font-bold text-gray-950 mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-amber-400 rounded-full"></span>Minggu Ini</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Submit laporan PKM</span><span class="text-xs text-gray-400">Rabu</span></label>
+<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Presentasi kelompok Manajemen</span><span class="text-xs text-gray-400">Kamis</span></label>
+<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Quiz online Kalkulus</span><span class="text-xs text-gray-400">Jumat</span></label>
+</div>
+</div>
+</div>
+</div>
+
+<!-- KEUANGAN SECTION -->
+<div id="sec-keuangan" class="section max-w-3xl">
+<div class="flex items-center justify-between mb-6">
+<h1 class="text-2xl font-extrabold text-gray-950">Keuangan</h1>
+<button onclick="alert('Fitur tambah transaksi segera hadir!')" class="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-primary/25">+ Transaksi</button>
+</div>
+<div class="grid sm:grid-cols-3 gap-5 mb-6">
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pemasukan</p><p class="text-2xl font-extrabold text-green-600">Rp1.500.000</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pengeluaran</p><p class="text-2xl font-extrabold text-red-500">Rp650.000</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa</p><p class="text-2xl font-extrabold text-gray-950">Rp850.000</p></div>
+</div>
+<div class="bg-white rounded-2xl border border-gray-100 p-6">
+<h3 class="font-bold text-gray-950 mb-4">Transaksi Terakhir</h3>
+<div class="divide-y divide-gray-50">
+<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Uang bulanan</p><p class="text-xs text-gray-400">1 Mei 2025</p></div><span class="text-sm font-bold text-green-600">+Rp1.500.000</span></div>
+<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Makan siang</p><p class="text-xs text-gray-400">2 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp25.000</span></div>
+<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Kos bulanan</p><p class="text-xs text-gray-400">3 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp500.000</span></div>
+<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Fotokopi materi</p><p class="text-xs text-gray-400">4 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp15.000</span></div>
+<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Transportasi</p><p class="text-xs text-gray-400">5 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp110.000</span></div>
+</div>
+</div>
+</div>
+
+</main>
+</div>
+</div>
+
+<script>
+const SUPABASE_URL='https://vmullhzdnosjnnwgsang.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtdWxsaHpkbm9zam5ud2dzYW5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMzkwNTQsImV4cCI6MjA5MzkxNTA1NH0.OcNK92Ong-rDUKjEC-3l47B7uEJYuMViTedaDrFc2rw';
+const{createClient}=window.supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const ANTHROPIC_KEY='';
+const SYSTEM_PROMPT='You are StudyFlow AI, a study productivity assistant for Indonesian students. Help users with study schedules, time management, and student budgeting. Reply in Bahasa Indonesia, max 3-4 sentences, friendly and practical. NO markdown formatting, NO tables, NO bullet points, NO emojis.';
+let chatHistory=[];
+
+// Auth check
+(async()=>{
+const{data:{session}}=await sb.auth.getSession();
+if(!session){window.location.href='login.html';return}
+const name=session.user.user_metadata?.full_name||session.user.email.split('@')[0];
+document.getElementById('greeting').textContent='Selamat datang, '+name+'!';
+document.getElementById('user-sidebar-name').textContent=name;
+document.getElementById('user-sidebar-email').textContent=session.user.email;
+document.getElementById('user-avatar').textContent=name.charAt(0).toUpperCase();
+})();
+
+function showSection(id,btn){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById('sec-'+id).classList.add('active');
+document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
+if(btn)btn.classList.add('active');
+const titles={dashboard:'Dashboard',planner:'AI Planner',tugas:'Tugas & Jadwal',keuangan:'Keuangan'};
+document.getElementById('page-title').textContent=titles[id]||'Dashboard';
+if(window.innerWidth<768)toggleSidebar();
+}
+
+function toggleSidebar(){
+const s=document.getElementById('sidebar'),o=document.getElementById('overlay');
+s.classList.toggle('-translate-x-full');
+o.classList.toggle('hidden');
+}
+
+async function logout(){
+await sb.auth.signOut();
+window.location.href='index.html';
+}
+
+// Chat
+document.getElementById('chat-form').addEventListener('submit',async function(e){
+e.preventDefault();
+const input=document.getElementById('chat-input');
+const msg=input.value.trim();
+if(!msg)return;
+input.value='';
+const area=document.getElementById('chat-area');
+area.innerHTML+='<div class="flex"><div class="chat-bubble chat-user">'+escHtml(msg)+'</div></div>';
+area.scrollTop=area.scrollHeight;
+
+const btn=document.getElementById('chat-btn');
+btn.disabled=true;btn.textContent='...';
+
+chatHistory.push({role:'user',content:msg});
+
+if(!ANTHROPIC_KEY){
+area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">API key belum diatur. Tambahkan ANTHROPIC_KEY di dashboard.html untuk mengaktifkan AI.</div></div>';
+btn.disabled=false;btn.textContent='Kirim';area.scrollTop=area.scrollHeight;return;
+}
+
+try{
+const res=await fetch('https://api.anthropic.com/v1/messages',{
+method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:500,system:SYSTEM_PROMPT,messages:chatHistory})
+});
+const data=await res.json();
+const reply=data.content?.[0]?.text||'Maaf, terjadi kesalahan.';
+chatHistory.push({role:'assistant',content:reply});
+area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">'+escHtml(reply)+'</div></div>';
+}catch(err){
+area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">Gagal menghubungi AI. Coba lagi nanti.</div></div>';
+}
+btn.disabled=false;btn.textContent='Kirim';area.scrollTop=area.scrollHeight;
+});
+
+function escHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+</script>
+</body>
+</html>
