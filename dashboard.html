@@ -124,12 +124,12 @@ Logout
 <div id="sec-tugas" class="section max-w-3xl">
 <div class="flex items-center justify-between mb-6">
 <h1 class="text-2xl font-extrabold text-gray-950">Tugas &amp; Jadwal</h1>
-<button onclick="alert('Fitur tambah tugas segera hadir!')" class="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-primary/25">+ Tambah Tugas</button>
+<button onclick="openModal('task-modal')" class="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-primary/25">+ Tambah Tugas</button>
 </div>
 <div class="space-y-6">
 <div class="bg-white rounded-2xl border border-gray-100 p-6">
 <h3 class="font-bold text-gray-950 mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-primary rounded-full"></span>Hari Ini</h3>
-<div class="space-y-3">
+<div class="space-y-3" id="tasks-hari-ini">
 <label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Baca Chapter 5 Statistika</span><span class="text-xs text-gray-400">09:00</span></label>
 <label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Kerjakan tugas Algoritma</span><span class="text-xs text-gray-400">13:00</span></label>
 <label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary" checked><s class="flex-1 text-gray-400">Review catatan Basis Data</s><span class="text-xs text-gray-400">08:00</span></label>
@@ -137,7 +137,7 @@ Logout
 </div>
 <div class="bg-white rounded-2xl border border-gray-100 p-6">
 <h3 class="font-bold text-gray-950 mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-amber-400 rounded-full"></span>Minggu Ini</h3>
-<div class="space-y-3">
+<div class="space-y-3" id="tasks-minggu-ini">
 <label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Submit laporan PKM</span><span class="text-xs text-gray-400">Rabu</span></label>
 <label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Presentasi kelompok Manajemen</span><span class="text-xs text-gray-400">Kamis</span></label>
 <label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Quiz online Kalkulus</span><span class="text-xs text-gray-400">Jumat</span></label>
@@ -150,16 +150,16 @@ Logout
 <div id="sec-keuangan" class="section max-w-3xl">
 <div class="flex items-center justify-between mb-6">
 <h1 class="text-2xl font-extrabold text-gray-950">Keuangan</h1>
-<button onclick="alert('Fitur tambah transaksi segera hadir!')" class="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-primary/25">+ Transaksi</button>
+<button onclick="openModal('txn-modal')" class="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-primary/25">+ Transaksi</button>
 </div>
 <div class="grid sm:grid-cols-3 gap-5 mb-6">
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pemasukan</p><p class="text-2xl font-extrabold text-green-600">Rp1.500.000</p></div>
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pengeluaran</p><p class="text-2xl font-extrabold text-red-500">Rp650.000</p></div>
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa</p><p class="text-2xl font-extrabold text-gray-950">Rp850.000</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pemasukan</p><p class="text-2xl font-extrabold text-green-600" id="fin-income">Rp1.500.000</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Pengeluaran</p><p class="text-2xl font-extrabold text-red-500" id="fin-expense">Rp650.000</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa</p><p class="text-2xl font-extrabold text-gray-950" id="fin-balance">Rp850.000</p></div>
 </div>
 <div class="bg-white rounded-2xl border border-gray-100 p-6">
 <h3 class="font-bold text-gray-950 mb-4">Transaksi Terakhir</h3>
-<div class="divide-y divide-gray-50">
+<div class="divide-y divide-gray-50" id="txn-list">
 <div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Uang bulanan</p><p class="text-xs text-gray-400">1 Mei 2025</p></div><span class="text-sm font-bold text-green-600">+Rp1.500.000</span></div>
 <div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Makan siang</p><p class="text-xs text-gray-400">2 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp25.000</span></div>
 <div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">Kos bulanan</p><p class="text-xs text-gray-400">3 Mei 2025</p></div><span class="text-sm font-bold text-red-500">-Rp500.000</span></div>
@@ -170,6 +170,31 @@ Logout
 </div>
 
 </main>
+</div>
+</div>
+
+<!-- Task Modal -->
+<div id="task-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" onclick="if(event.target===this)closeModal('task-modal')">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
+<h3 class="text-lg font-bold text-gray-950 mb-5">Tambah Tugas</h3>
+<form id="task-form" class="space-y-4">
+<div><label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama tugas</label><input type="text" id="task-name" required placeholder="Contoh: Baca buku statistika" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm"></div>
+<div><label class="block text-sm font-semibold text-gray-700 mb-1.5">Kategori</label><select id="task-cat" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm"><option value="hari-ini">Hari Ini</option><option value="minggu-ini">Minggu Ini</option></select></div>
+<div class="flex gap-3 pt-2"><button type="button" onclick="closeModal('task-modal')" class="flex-1 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-500 hover:border-gray-300 transition">Batal</button><button type="submit" class="flex-1 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-semibold shadow-md shadow-primary/25 transition">Tambah</button></div>
+</form>
+</div>
+</div>
+
+<!-- Transaction Modal -->
+<div id="txn-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40" onclick="if(event.target===this)closeModal('txn-modal')">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
+<h3 class="text-lg font-bold text-gray-950 mb-5">Tambah Transaksi</h3>
+<form id="txn-form" class="space-y-4">
+<div><label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama transaksi</label><input type="text" id="txn-name" required placeholder="Contoh: Makan siang" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm"></div>
+<div><label class="block text-sm font-semibold text-gray-700 mb-1.5">Jumlah (Rp)</label><input type="number" id="txn-amount" required min="1" placeholder="25000" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm"></div>
+<div><label class="block text-sm font-semibold text-gray-700 mb-1.5">Tipe</label><select id="txn-type" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm"><option value="income">Pemasukan</option><option value="expense">Pengeluaran</option></select></div>
+<div class="flex gap-3 pt-2"><button type="button" onclick="closeModal('txn-modal')" class="flex-1 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-500 hover:border-gray-300 transition">Batal</button><button type="submit" class="flex-1 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-semibold shadow-md shadow-primary/25 transition">Simpan</button></div>
+</form>
 </div>
 </div>
 
@@ -275,6 +300,53 @@ span.className=textEl.className;
 span.classList.remove('text-gray-400');
 textEl.replaceWith(span);
 }
+});
+
+// Modals
+function openModal(id){var m=document.getElementById(id);m.classList.remove('hidden');m.classList.add('flex');}
+function closeModal(id){var m=document.getElementById(id);m.classList.add('hidden');m.classList.remove('flex');}
+
+// Add task
+document.getElementById('task-form').addEventListener('submit',function(e){
+e.preventDefault();
+var name=document.getElementById('task-name').value.trim();
+var cat=document.getElementById('task-cat').value;
+if(!name)return;
+var container=document.getElementById('tasks-'+cat);
+var label=document.createElement('label');
+label.className='flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50';
+label.innerHTML='<input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">'+escHtml(name)+'</span><span class="text-xs text-gray-400">Baru</span>';
+container.appendChild(label);
+document.getElementById('task-name').value='';
+closeModal('task-modal');
+});
+
+// Add transaction
+var totalIncome=1500000,totalExpense=650000;
+function fmtRp(n){return'Rp'+n.toLocaleString('id-ID');}
+function updateFinCards(){
+document.getElementById('fin-income').textContent=fmtRp(totalIncome);
+document.getElementById('fin-expense').textContent=fmtRp(totalExpense);
+document.getElementById('fin-balance').textContent=fmtRp(totalIncome-totalExpense);
+}
+document.getElementById('txn-form').addEventListener('submit',function(e){
+e.preventDefault();
+var name=document.getElementById('txn-name').value.trim();
+var amount=parseInt(document.getElementById('txn-amount').value);
+var type=document.getElementById('txn-type').value;
+if(!name||!amount)return;
+var isIncome=type==='income';
+if(isIncome)totalIncome+=amount;else totalExpense+=amount;
+updateFinCards();
+var today=new Date();var dateStr=today.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][today.getMonth()]+' '+today.getFullYear();
+var row=document.createElement('div');
+row.className='flex items-center justify-between py-3';
+row.innerHTML='<div><p class="text-sm font-medium text-gray-900">'+escHtml(name)+'</p><p class="text-xs text-gray-400">'+dateStr+'</p></div><span class="text-sm font-bold '+(isIncome?'text-green-600':'text-red-500')+'">'+(isIncome?'+':'-')+fmtRp(amount)+'</span>';
+var list=document.getElementById('txn-list');
+list.insertBefore(row,list.firstChild);
+document.getElementById('txn-name').value='';
+document.getElementById('txn-amount').value='';
+closeModal('txn-modal');
 });
 </script>
 </body>
