@@ -82,18 +82,14 @@ Logout
 <h1 class="text-2xl font-extrabold text-gray-950 mb-1" id="greeting">Selamat datang!</h1>
 <p class="text-gray-400 text-sm mb-8">Berikut ringkasan aktivitas belajar kamu hari ini.</p>
 <div class="grid sm:grid-cols-3 gap-5 mb-8">
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Streak Belajar</p><p class="text-3xl font-extrabold text-gray-950">7 <span class="text-base font-normal text-gray-400">hari</span></p></div>
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Jam Belajar Minggu Ini</p><p class="text-3xl font-extrabold text-primary">12.5 <span class="text-base font-normal text-gray-400">jam</span></p></div>
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa Budget</p><p class="text-3xl font-extrabold text-green-600">Rp850K</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Tugas Hari Ini</p><p class="text-3xl font-extrabold text-gray-950" id="dashboard-task-count">0/0</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Total Tugas</p><p class="text-3xl font-extrabold text-primary" id="dashboard-total-tasks">0</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa Budget</p><p class="text-3xl font-extrabold text-green-600" id="dashboard-balance">Rp0</p></div>
 </div>
 <div class="grid md:grid-cols-2 gap-5">
 <div class="bg-white rounded-2xl border border-gray-100 p-6">
 <h3 class="font-bold text-gray-950 mb-4">Tugas Hari Ini</h3>
-<div class="space-y-3">
-<label class="flex items-center gap-3 text-sm cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span>Baca Chapter 5 Statistika</span></label>
-<label class="flex items-center gap-3 text-sm cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span>Kerjakan tugas Algoritma</span></label>
-<label class="flex items-center gap-3 text-sm cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-primary" checked><s class="text-gray-400">Review catatan Basis Data</s></label>
-</div>
+<div class="space-y-3" id="dashboard-tasks"><p class="text-sm text-gray-400">Memuat tugas...</p></div>
 </div>
 <div class="bg-gradient-to-br from-primary to-blue-600 rounded-2xl p-6 text-white">
 <div class="flex items-center gap-2 mb-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg><h3 class="font-bold">Saran AI</h3></div>
@@ -130,17 +126,13 @@ Logout
 <div class="bg-white rounded-2xl border border-gray-100 p-6">
 <h3 class="font-bold text-gray-950 mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-primary rounded-full"></span>Hari Ini</h3>
 <div class="space-y-3" id="tasks-hari-ini">
-<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Baca Chapter 5 Statistika</span><span class="text-xs text-gray-400">09:00</span></label>
-<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Kerjakan tugas Algoritma</span><span class="text-xs text-gray-400">13:00</span></label>
-<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary" checked><s class="flex-1 text-gray-400">Review catatan Basis Data</s><span class="text-xs text-gray-400">08:00</span></label>
+<p class="text-sm text-gray-400 py-2" id="tasks-hari-ini-empty">Memuat tugas...</p>
 </div>
 </div>
 <div class="bg-white rounded-2xl border border-gray-100 p-6">
 <h3 class="font-bold text-gray-950 mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-amber-400 rounded-full"></span>Minggu Ini</h3>
 <div class="space-y-3" id="tasks-minggu-ini">
-<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Submit laporan PKM</span><span class="text-xs text-gray-400">Rabu</span></label>
-<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Presentasi kelompok Manajemen</span><span class="text-xs text-gray-400">Kamis</span></label>
-<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">Quiz online Kalkulus</span><span class="text-xs text-gray-400">Jumat</span></label>
+<p class="text-sm text-gray-400 py-2" id="tasks-minggu-ini-empty">Memuat tugas...</p>
 </div>
 </div>
 </div>
@@ -200,21 +192,28 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const{createClient}=window.supabase;
 const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const ANTHROPIC_KEY='';
-const SYSTEM_PROMPT='You are StudyFlow AI, a study productivity assistant for Indonesian students. Help users with study schedules, time management, and student budgeting. Reply in Bahasa Indonesia, max 3-4 sentences, friendly and practical. NO markdown formatting, NO tables, NO bullet points, NO emojis.';
 let chatHistory=[];
+let currentUserId=null;
+let tasks=[];
+let transactions=[];
 
-// Auth check
+function escHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+function fmtRp(n){return'Rp'+n.toLocaleString('id-ID');}
+
+// ── Auth check & data load ──
 (async()=>{
 const{data:{session}}=await sb.auth.getSession();
 if(!session){window.location.href='login.html';return}
+currentUserId=session.user.id;
 const name=session.user.user_metadata?.full_name||session.user.email.split('@')[0];
 document.getElementById('greeting').textContent='Selamat datang, '+name+'!';
 document.getElementById('user-sidebar-name').textContent=name;
 document.getElementById('user-sidebar-email').textContent=session.user.email;
 document.getElementById('user-avatar').textContent=name.charAt(0).toUpperCase();
+await Promise.all([loadTasks(),loadTransactions()]);
 })();
 
+// ── Navigation ──
 function showSection(id,btn){
 document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
 document.getElementById('sec-'+id).classList.add('active');
@@ -224,19 +223,139 @@ const titles={dashboard:'Dashboard',planner:'AI Planner',tugas:'Tugas & Jadwal',
 document.getElementById('page-title').textContent=titles[id]||'Dashboard';
 if(window.innerWidth<768)toggleSidebar();
 }
-
 function toggleSidebar(){
 const s=document.getElementById('sidebar'),o=document.getElementById('overlay');
-s.classList.toggle('-translate-x-full');
-o.classList.toggle('hidden');
+s.classList.toggle('-translate-x-full');o.classList.toggle('hidden');
+}
+async function logout(){await sb.auth.signOut();window.location.href='index.html';}
+
+// ── Modals ──
+function openModal(id){var m=document.getElementById(id);m.classList.remove('hidden');m.classList.add('flex');}
+function closeModal(id){var m=document.getElementById(id);m.classList.add('hidden');m.classList.remove('flex');}
+
+// ══════════════════════════════
+// TASKS — Supabase CRUD
+// ══════════════════════════════
+async function loadTasks(){
+const{data,error}=await sb.from('tasks').select('*').eq('user_id',currentUserId).order('created_at',{ascending:true});
+if(!error)tasks=data||[];
+renderAllTasks();
 }
 
-async function logout(){
-await sb.auth.signOut();
-window.location.href='index.html';
+function taskHTML(t,compact){
+const ck=t.is_done?'checked':'';
+const cls=t.is_done?'text-gray-400':'';
+const tag=t.is_done?'s':'span';
+if(compact){
+return '<label class="flex items-center gap-3 text-sm cursor-pointer"><input type="checkbox" '+ck+' class="w-4 h-4 rounded text-primary" onchange="toggleTask(\''+t.id+'\',this.checked)"><'+tag+' class="'+cls+'">'+escHtml(t.name)+'</'+tag+'></label>';
+}
+return '<label class="flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50"><input type="checkbox" '+ck+' class="w-4 h-4 rounded text-primary" onchange="toggleTask(\''+t.id+'\',this.checked)"><'+tag+' class="flex-1 '+cls+'">'+escHtml(t.name)+'</'+tag+'><button onclick="event.preventDefault();deleteTask(\''+t.id+'\')" class="text-gray-300 hover:text-red-400 transition ml-2" title="Hapus"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></label>';
 }
 
-// Chat
+function renderAllTasks(){
+// Tugas section
+var hi=tasks.filter(t=>t.category==='hari-ini');
+var mi=tasks.filter(t=>t.category==='minggu-ini');
+var cHI=document.getElementById('tasks-hari-ini');
+var cMI=document.getElementById('tasks-minggu-ini');
+cHI.innerHTML=hi.length?hi.map(t=>taskHTML(t,false)).join(''):'<p class="text-sm text-gray-400 py-2">Belum ada tugas hari ini.</p>';
+cMI.innerHTML=mi.length?mi.map(t=>taskHTML(t,false)).join(''):'<p class="text-sm text-gray-400 py-2">Belum ada tugas minggu ini.</p>';
+// Dashboard tasks (compact)
+var dT=document.getElementById('dashboard-tasks');
+dT.innerHTML=hi.length?hi.map(t=>taskHTML(t,true)).join(''):'<p class="text-sm text-gray-400">Belum ada tugas hari ini.</p>';
+// Metrics
+updateMetrics();
+}
+
+async function toggleTask(id,isDone){
+await sb.from('tasks').update({is_done:isDone}).eq('id',id);
+var t=tasks.find(x=>x.id===id);if(t)t.is_done=isDone;
+renderAllTasks();
+}
+
+async function deleteTask(id){
+await sb.from('tasks').delete().eq('id',id);
+tasks=tasks.filter(t=>t.id!==id);
+renderAllTasks();
+}
+
+document.getElementById('task-form').addEventListener('submit',async function(e){
+e.preventDefault();
+var name=document.getElementById('task-name').value.trim();
+var cat=document.getElementById('task-cat').value;
+if(!name||!currentUserId)return;
+var btn=this.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Menyimpan...';
+var{data,error}=await sb.from('tasks').insert({user_id:currentUserId,name:name,category:cat}).select().single();
+if(!error&&data){tasks.push(data);renderAllTasks();}
+btn.disabled=false;btn.textContent='Tambah';
+document.getElementById('task-name').value='';
+closeModal('task-modal');
+});
+
+// ══════════════════════════════
+// TRANSACTIONS — Supabase CRUD
+// ══════════════════════════════
+async function loadTransactions(){
+const{data,error}=await sb.from('transactions').select('*').eq('user_id',currentUserId).order('created_at',{ascending:false});
+if(!error)transactions=data||[];
+renderTransactions();
+}
+
+function renderTransactions(){
+var list=document.getElementById('txn-list');
+if(!transactions.length){list.innerHTML='<p class="text-sm text-gray-400 py-4 text-center">Belum ada transaksi.</p>';updateFinCards();return;}
+list.innerHTML=transactions.map(function(t){
+var isInc=t.type==='income';
+var d=new Date(t.created_at);
+var ds=d.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][d.getMonth()]+' '+d.getFullYear();
+return '<div class="flex items-center justify-between py-3"><div><p class="text-sm font-medium text-gray-900">'+escHtml(t.name)+'</p><p class="text-xs text-gray-400">'+ds+'</p></div><div class="flex items-center gap-2"><span class="text-sm font-bold '+(isInc?'text-green-600':'text-red-500')+'">'+(isInc?'+':'-')+fmtRp(t.amount)+'</span><button onclick="deleteTransaction(\''+t.id+'\')" class="text-gray-300 hover:text-red-400 transition" title="Hapus"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div></div>';
+}).join('');
+updateFinCards();
+}
+
+function updateFinCards(){
+var inc=transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+var exp=transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+document.getElementById('fin-income').textContent=fmtRp(inc);
+document.getElementById('fin-expense').textContent=fmtRp(exp);
+document.getElementById('fin-balance').textContent=fmtRp(inc-exp);
+updateMetrics();
+}
+
+async function deleteTransaction(id){
+await sb.from('transactions').delete().eq('id',id);
+transactions=transactions.filter(t=>t.id!==id);
+renderTransactions();
+}
+
+document.getElementById('txn-form').addEventListener('submit',async function(e){
+e.preventDefault();
+var name=document.getElementById('txn-name').value.trim();
+var amount=parseInt(document.getElementById('txn-amount').value);
+var type=document.getElementById('txn-type').value;
+if(!name||!amount||!currentUserId)return;
+var btn=this.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Menyimpan...';
+var{data,error}=await sb.from('transactions').insert({user_id:currentUserId,name:name,amount:amount,type:type}).select().single();
+if(!error&&data){transactions.unshift(data);renderTransactions();}
+btn.disabled=false;btn.textContent='Simpan';
+document.getElementById('txn-name').value='';document.getElementById('txn-amount').value='';
+closeModal('txn-modal');
+});
+
+// ── Dashboard metrics ──
+function updateMetrics(){
+var hi=tasks.filter(t=>t.category==='hari-ini');
+var done=hi.filter(t=>t.is_done).length;
+document.getElementById('dashboard-task-count').textContent=done+'/'+hi.length;
+document.getElementById('dashboard-total-tasks').textContent=tasks.length;
+var inc=transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+var exp=transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+document.getElementById('dashboard-balance').textContent=fmtRp(inc-exp);
+}
+
+// ══════════════════════════════
+// AI CHAT — Groq via Netlify proxy
+// ══════════════════════════════
 document.getElementById('chat-form').addEventListener('submit',async function(e){
 e.preventDefault();
 const input=document.getElementById('chat-input');
@@ -246,104 +365,20 @@ input.value='';
 const area=document.getElementById('chat-area');
 area.innerHTML+='<div class="flex"><div class="chat-bubble chat-user">'+escHtml(msg)+'</div></div>';
 area.scrollTop=area.scrollHeight;
-
 const btn=document.getElementById('chat-btn');
 btn.disabled=true;btn.textContent='...';
-
 chatHistory.push({role:'user',content:msg});
-
-if(!ANTHROPIC_KEY){
-area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">API key belum diatur. Tambahkan ANTHROPIC_KEY di dashboard.html untuk mengaktifkan AI.</div></div>';
-btn.disabled=false;btn.textContent='Kirim';area.scrollTop=area.scrollHeight;return;
-}
-
 try{
-const res=await fetch('https://api.anthropic.com/v1/messages',{
-method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:500,system:SYSTEM_PROMPT,messages:chatHistory})
-});
+const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory})});
 const data=await res.json();
-const reply=data.content?.[0]?.text||'Maaf, terjadi kesalahan.';
+if(data.error)throw new Error(data.error);
+const reply=data.reply;
 chatHistory.push({role:'assistant',content:reply});
 area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">'+escHtml(reply)+'</div></div>';
 }catch(err){
 area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">Gagal menghubungi AI. Coba lagi nanti.</div></div>';
 }
 btn.disabled=false;btn.textContent='Kirim';area.scrollTop=area.scrollHeight;
-});
-
-function escHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
-
-// Checkbox strikethrough toggle
-document.addEventListener('change',function(e){
-if(e.target.type!=='checkbox')return;
-var label=e.target.closest('label');
-if(!label)return;
-var textEl=label.querySelector('span, s');
-if(!textEl)return;
-var text=textEl.textContent;
-if(e.target.checked){
-var s=document.createElement('s');
-s.textContent=text;
-s.className=textEl.className;
-s.classList.add('text-gray-400');
-s.classList.remove('text-gray-900','text-gray-800');
-textEl.replaceWith(s);
-}else{
-var span=document.createElement('span');
-span.textContent=text;
-span.className=textEl.className;
-span.classList.remove('text-gray-400');
-textEl.replaceWith(span);
-}
-});
-
-// Modals
-function openModal(id){var m=document.getElementById(id);m.classList.remove('hidden');m.classList.add('flex');}
-function closeModal(id){var m=document.getElementById(id);m.classList.add('hidden');m.classList.remove('flex');}
-
-// Add task
-document.getElementById('task-form').addEventListener('submit',function(e){
-e.preventDefault();
-var name=document.getElementById('task-name').value.trim();
-var cat=document.getElementById('task-cat').value;
-if(!name)return;
-var container=document.getElementById('tasks-'+cat);
-var label=document.createElement('label');
-label.className='flex items-center gap-3 text-sm cursor-pointer p-2 rounded-lg hover:bg-gray-50';
-label.innerHTML='<input type="checkbox" class="w-4 h-4 rounded text-primary"><span class="flex-1">'+escHtml(name)+'</span><span class="text-xs text-gray-400">Baru</span>';
-container.appendChild(label);
-document.getElementById('task-name').value='';
-closeModal('task-modal');
-});
-
-// Add transaction
-var totalIncome=0,totalExpense=0;
-function fmtRp(n){return'Rp'+n.toLocaleString('id-ID');}
-function updateFinCards(){
-document.getElementById('fin-income').textContent=fmtRp(totalIncome);
-document.getElementById('fin-expense').textContent=fmtRp(totalExpense);
-document.getElementById('fin-balance').textContent=fmtRp(totalIncome-totalExpense);
-}
-document.getElementById('txn-form').addEventListener('submit',function(e){
-e.preventDefault();
-var name=document.getElementById('txn-name').value.trim();
-var amount=parseInt(document.getElementById('txn-amount').value);
-var type=document.getElementById('txn-type').value;
-if(!name||!amount)return;
-var isIncome=type==='income';
-if(isIncome)totalIncome+=amount;else totalExpense+=amount;
-updateFinCards();
-var today=new Date();var dateStr=today.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][today.getMonth()]+' '+today.getFullYear();
-var row=document.createElement('div');
-row.className='flex items-center justify-between py-3';
-row.innerHTML='<div><p class="text-sm font-medium text-gray-900">'+escHtml(name)+'</p><p class="text-xs text-gray-400">'+dateStr+'</p></div><span class="text-sm font-bold '+(isIncome?'text-green-600':'text-red-500')+'">'+(isIncome?'+':'-')+fmtRp(amount)+'</span>';
-var list=document.getElementById('txn-list');
-var empty=document.getElementById('txn-empty');if(empty)empty.remove();
-list.insertBefore(row,list.firstChild);
-document.getElementById('txn-name').value='';
-document.getElementById('txn-amount').value='';
-closeModal('txn-modal');
 });
 </script>
 </body>
