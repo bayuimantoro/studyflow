@@ -26,6 +26,15 @@ tailwind.config={darkMode: 'class', theme:{extend:{colors:{primary:'#378ADD','pr
 .locked-overlay{position:relative}
 .locked-overlay::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.7);backdrop-filter:blur(4px);border-radius:1rem;z-index:10}
 .locked-overlay .locked-cta{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;text-align:center}
+.dark body, .dark .bg-gray-50 { background-color: #111827 !important; }
+.dark .bg-white { background-color: #1f2937 !important; }
+.dark .text-gray-950, .dark .text-gray-900 { color: #f9fafb !important; }
+.dark .text-gray-700 { color: #d1d5db !important; }
+.dark .border-gray-100, .dark .border-gray-200 { border-color: #374151 !important; }
+.dark .metric-card { background: #1f2937; border-color: #374151; }
+.dark .sidebar-btn:hover { background: #374151; color: #fff; }
+.dark input, .dark select { background-color: #374151; color: #fff; border-color: #4b5563; }
+.dark .chat-ai { background: #374151; color: #f9fafb; }
 </style>
 </head>
 <body class="font-sans bg-gray-50 dark:bg-gray-900 antialiased transition-colors">
