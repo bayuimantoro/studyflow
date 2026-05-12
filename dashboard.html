@@ -255,11 +255,14 @@ let transactions=[];
 let isPro=false;
 
 if(localStorage.getItem('sf_theme')==='dark') document.documentElement.classList.add('dark');
-function toggleTheme(){
+function toggleDarkMode(){
+  console.log('Toggle Dark Mode clicked. Current classList:', document.documentElement.className);
   if(document.documentElement.classList.contains('dark')){
     document.documentElement.classList.remove('dark'); localStorage.setItem('sf_theme','light');
+    console.log('Theme changed to light. Saved to localStorage.');
   }else{
     document.documentElement.classList.add('dark'); localStorage.setItem('sf_theme','dark');
+    console.log('Theme changed to dark. Saved to localStorage.');
   }
 }
 
