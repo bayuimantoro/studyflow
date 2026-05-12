@@ -99,9 +99,9 @@ Logout
 <h1 class="text-2xl font-extrabold text-gray-950 mb-1" id="greeting">Selamat datang!</h1>
 <p class="text-gray-400 text-sm mb-8">Berikut ringkasan aktivitas belajar kamu hari ini.</p>
 <div class="grid sm:grid-cols-3 gap-5 mb-8">
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Tugas Hari Ini</p><p class="text-3xl font-extrabold text-gray-950" id="dashboard-task-count">0/0</p></div>
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Total Tugas</p><p class="text-3xl font-extrabold text-primary" id="dashboard-total-tasks">0</p></div>
-<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa Budget</p><p class="text-3xl font-extrabold text-green-600" id="dashboard-balance">Rp0</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Streak Belajar</p><p class="text-3xl font-extrabold text-gray-950" id="dashboard-streak">Memuat...</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Jam Belajar Minggu Ini</p><p class="text-3xl font-extrabold text-primary" id="dashboard-hours">Memuat...</p></div>
+<div class="metric-card"><p class="text-sm text-gray-400 mb-1">Sisa Budget</p><p class="text-3xl font-extrabold text-green-600" id="dashboard-balance">Memuat...</p></div>
 </div>
 <div class="grid md:grid-cols-2 gap-5">
 <div class="bg-white rounded-2xl border border-gray-100 p-6">
@@ -418,10 +418,27 @@ closeModal('txn-modal');
 
 // ── Dashboard metrics ──
 function updateMetrics(){
-var hi=tasks.filter(t=>t.category==='hari-ini');
-var done=hi.filter(t=>t.is_done).length;
-document.getElementById('dashboard-task-count').textContent=done+'/'+hi.length;
-document.getElementById('dashboard-total-tasks').textContent=tasks.length;
+var doneTasks=tasks.filter(t=>t.is_done);
+var dates=[...new Set(doneTasks.map(t=>{var d=new Date(t.created_at);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}))].sort().reverse();
+var streak=0;
+var today=new Date();
+var tStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+today.setDate(today.getDate()-1);
+var yStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+var cDate=new Date();
+var expStr=tStr;
+if(dates.includes(tStr)||dates.includes(yStr)){
+if(!dates.includes(tStr)){cDate.setDate(cDate.getDate()-1);expStr=yStr;}
+for(var i=0;i<365;i++){
+if(dates.includes(expStr)){streak++;cDate.setDate(cDate.getDate()-1);expStr=cDate.getFullYear()+'-'+String(cDate.getMonth()+1).padStart(2,'0')+'-'+String(cDate.getDate()).padStart(2,'0');}else{break;}
+}
+}
+document.getElementById('dashboard-streak').textContent=streak+' Hari';
+
+var weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);weekAgo.setHours(0,0,0,0);
+var recentDone=tasks.filter(t=>t.is_done && new Date(t.created_at)>=weekAgo);
+document.getElementById('dashboard-hours').textContent=(recentDone.length*2)+' Jam';
+
 var inc=transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
 var exp=transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
 document.getElementById('dashboard-balance').textContent=fmtRp(inc-exp);
