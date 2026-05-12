@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade ke Pro - StudyFlow</title>
+    <meta name="description" content="Upgrade ke StudyFlow Pro untuk unlimited AI, export PDF, dan analisis mingguan.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key=""></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { primary: '#378ADD', 'primary-dark': '#2a6db8', 'primary-light': '#e8f2fc', 'gray-950': '#0a0f1a' }, fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
+    <style>
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .fade-up { animation: fadeUp .5s ease-out forwards; }
+        .blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12;pointer-events:none}
+        .card-hover{transition:transform .3s,box-shadow .3s}
+        .card-hover:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(55,138,221,.15)}
+    </style>
+</head>
+<body class="font-sans bg-gray-50 min-h-screen antialiased overflow-x-hidden">
+
+    <div class="blob w-[400px] h-[400px] bg-primary -top-32 -right-32 fixed"></div>
+    <div class="blob w-[300px] h-[300px] bg-blue-400 bottom-0 -left-24 fixed"></div>
+
+    <!-- Top bar -->
+    <div class="w-full max-w-4xl mx-auto px-5 pt-8 flex items-center justify-between">
+        <a href="dashboard.html" class="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Kembali ke Dashboard
+        </a>
+        <a href="index.html" class="flex items-center gap-2 group">
+            <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-md shadow-primary/30 group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+            </div>
+            <span class="text-lg font-extrabold text-gray-950">Study<span class="text-primary">Flow</span></span>
+        </a>
+    </div>
+
+    <main class="max-w-4xl mx-auto px-5 py-12 md:py-20 relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-14 fade-up">
+            <div class="inline-flex items-center gap-2 bg-amber-100 text-amber-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                Upgrade ke Pro
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-gray-950 mb-4">Belajar Tanpa Batas<br><span class="text-primary">dengan StudyFlow Pro</span></h1>
+            <p class="text-gray-500 text-lg max-w-xl mx-auto">Dapatkan akses penuh ke semua fitur premium dan tingkatkan produktivitas belajar kamu.</p>
+        </div>
+
+        <!-- Comparison Cards -->
+        <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-16 fade-up" style="animation-delay:.15s">
+            <!-- Free -->
+            <div class="bg-white rounded-2xl p-8 border border-gray-200 card-hover flex flex-col">
+                <h3 class="text-xl font-bold text-gray-950 mb-1">Gratis</h3>
+                <p class="text-gray-400 text-sm mb-6">Paket saat ini</p>
+                <div class="mb-8">
+                    <span class="text-4xl font-extrabold text-gray-950">Rp0</span>
+                    <span class="text-gray-400 text-sm">/bulan</span>
+                </div>
+                <ul class="space-y-3 mb-8 flex-1">
+                    <li class="flex items-center gap-3 text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>5 AI query per bulan</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Manajemen tugas</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Expense tracker dasar</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-400"><svg class="w-5 h-5 text-gray-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>Export laporan PDF</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-400"><svg class="w-5 h-5 text-gray-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>Analisis progress mingguan</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-400"><svg class="w-5 h-5 text-gray-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>Priority support</li>
+                </ul>
+                <div class="text-center border-2 border-gray-200 text-gray-400 font-semibold py-3 rounded-full text-sm cursor-default">Paket Aktif</div>
+            </div>
+
+            <!-- Pro -->
+            <div class="bg-gray-950 rounded-2xl p-8 border border-gray-800 card-hover flex flex-col relative overflow-hidden">
+                <div class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">POPULER</div>
+                <h3 class="text-xl font-bold text-white mb-1">Pro</h3>
+                <p class="text-gray-400 text-sm mb-6">Untuk yang serius berprestasi</p>
+                <div class="mb-8">
+                    <span class="text-4xl font-extrabold text-white">Rp20.000</span>
+                    <span class="text-gray-400 text-sm">/bulan</span>
+                </div>
+                <ul class="space-y-3 mb-8 flex-1">
+                    <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><strong class="text-white">Unlimited</strong>&nbsp;AI query</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Manajemen tugas</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Expense tracker + analytics</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Export laporan PDF</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Analisis progress mingguan</li>
+                    <li class="flex items-center gap-3 text-sm text-gray-300"><svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Priority support</li>
+                </ul>
+                <button id="pay-btn" onclick="startPayment()" class="block w-full text-center bg-primary hover:bg-primary-dark text-white font-semibold py-3.5 rounded-full transition-all duration-300 shadow-lg shadow-primary/30 text-sm">
+                    Bayar Sekarang — Rp20.000
+                </button>
+            </div>
+        </div>
+
+        <!-- Already Pro Banner (hidden by default) -->
+        <div id="pro-active-banner" class="hidden max-w-3xl mx-auto mb-16">
+            <div class="bg-gradient-to-r from-primary to-blue-600 rounded-2xl p-8 text-center text-white">
+                <div class="flex items-center justify-center gap-2 mb-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.745 3.745 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg>
+                    <span class="text-xl font-bold">Kamu Sudah Pro!</span>
+                </div>
+                <p class="text-white/80 text-sm mb-2">Semua fitur premium sudah aktif.</p>
+                <p class="text-white/60 text-xs" id="pro-expires-text">Berlaku sampai: -</p>
+                <a href="dashboard.html" class="inline-block mt-4 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition">Kembali ke Dashboard</a>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="max-w-2xl mx-auto fade-up" style="animation-delay:.3s">
+            <h2 class="text-2xl font-extrabold text-gray-950 text-center mb-8">Pertanyaan Umum</h2>
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl border border-gray-100 p-5">
+                    <h4 class="font-bold text-gray-950 text-sm mb-2">Bagaimana cara bayar?</h4>
+                    <p class="text-gray-500 text-sm">Kamu bisa bayar via GoPay, OVO, bank transfer, atau kartu kredit melalui Midtrans yang aman dan terpercaya.</p>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-100 p-5">
+                    <h4 class="font-bold text-gray-950 text-sm mb-2">Bisa batal langganan?</h4>
+                    <p class="text-gray-500 text-sm">Tentu! Pro berlaku 30 hari sejak pembayaran. Tidak ada auto-renewal, jadi kamu bisa perpanjang kapan mau.</p>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-100 p-5">
+                    <h4 class="font-bold text-gray-950 text-sm mb-2">Kenapa murah banget?</h4>
+                    <p class="text-gray-500 text-sm">Kami buat StudyFlow khusus untuk mahasiswa Indonesia. Rp20.000/bulan lebih murah dari secangkir kopi!</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-8 border-t border-gray-100">
+        <div class="max-w-4xl mx-auto px-5 text-center">
+            <p class="text-gray-400 text-sm">&copy; 2025 StudyFlow. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL='https://vmullhzdnosjnnwgsang.supabase.co';
+        const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtdWxsaHpkbm9zam5ud2dzYW5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMzkwNTQsImV4cCI6MjA5MzkxNTA1NH0.OcNK92Ong-rDUKjEC-3l47B7uEJYuMViTedaDrFc2rw';
+        const{createClient}=window.supabase;
+        const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+        let currentUser=null;
+
+        (async()=>{
+            const{data:{session}}=await sb.auth.getSession();
+            if(!session){window.location.href='login.html';return}
+            currentUser=session.user;
+
+            // Check if already pro
+            const{data:profile}=await sb.from('profiles').select('is_pro,pro_expires_at').eq('id',session.user.id).single();
+            if(profile && profile.is_pro){
+                // Check expiry
+                if(!profile.pro_expires_at || new Date(profile.pro_expires_at)>new Date()){
+                    document.getElementById('pro-active-banner').classList.remove('hidden');
+                    document.querySelector('.grid.md\\:grid-cols-2').classList.add('hidden');
+                    if(profile.pro_expires_at){
+                        var d=new Date(profile.pro_expires_at);
+                        document.getElementById('pro-expires-text').textContent='Berlaku sampai: '+d.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][d.getMonth()]+' '+d.getFullYear();
+                    }
+                }
+            }
+        })();
+
+        async function startPayment(){
+            if(!currentUser)return;
+            var btn=document.getElementById('pay-btn');
+            btn.disabled=true;btn.textContent='Memproses...';
+            try{
+                var res=await fetch('/api/payment',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({user_id:currentUser.id,email:currentUser.email})
+                });
+                var data=await res.json();
+                if(data.error)throw new Error(data.error);
+                window.snap.pay(data.snap_token,{
+                    onSuccess:function(){
+                        alert('Pembayaran berhasil! Fitur Pro akan aktif dalam beberapa detik.');
+                        window.location.href='dashboard.html';
+                    },
+                    onPending:function(){
+                        alert('Pembayaran sedang diproses. Fitur Pro akan aktif setelah pembayaran dikonfirmasi.');
+                    },
+                    onError:function(){
+                        alert('Pembayaran gagal. Silakan coba lagi.');
+                    },
+                    onClose:function(){
+                        btn.disabled=false;btn.textContent='Bayar Sekarang — Rp20.000';
+                    }
+                });
+            }catch(err){
+                alert('Gagal memulai pembayaran: '+err.message);
+                btn.disabled=false;btn.textContent='Bayar Sekarang — Rp20.000';
+            }
+        }
+    </script>
+</body>
+</html>
