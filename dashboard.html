@@ -26,10 +26,11 @@ tailwind.config={darkMode: 'class', theme:{extend:{colors:{primary:'#378ADD','pr
 .locked-overlay{position:relative}
 .locked-overlay::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.7);backdrop-filter:blur(4px);border-radius:1rem;z-index:10}
 .locked-overlay .locked-cta{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;text-align:center}
-.dark body, .dark .bg-gray-50 { background-color: #111827 !important; }
+.dark body, .dark .bg-gray-50 { background-color: #111827 !important; color: #f9fafb !important; }
 .dark .bg-white { background-color: #1f2937 !important; }
-.dark .text-gray-950, .dark .text-gray-900 { color: #f9fafb !important; }
+.dark .text-gray-950, .dark .text-gray-900, .dark .text-gray-800 { color: #f9fafb !important; }
 .dark .text-gray-700 { color: #d1d5db !important; }
+.dark .text-gray-500, .dark .text-gray-400 { color: #9ca3af !important; }
 .dark .border-gray-100, .dark .border-gray-200 { border-color: #374151 !important; }
 .dark .metric-card { background: #1f2937; border-color: #374151; }
 .dark .sidebar-btn:hover { background: #374151; color: #fff; }
@@ -73,7 +74,7 @@ Keuangan
 </nav>
 <div class="p-4 border-t border-gray-100 dark:border-gray-700">
 <div class="flex items-center gap-2 mb-3">
-<button onclick="toggleDarkMode()" class="text-xs font-semibold bg-gray-100 dark:bg-gray-700 dark:text-white px-3 py-1.5 rounded-lg flex-1">Dark Mode</button>
+<button id="dark-mode-btn" onclick="toggleDarkMode()" class="text-xs font-semibold bg-gray-100 dark:bg-gray-700 dark:text-white px-3 py-1.5 rounded-lg flex-1">🌙 Dark Mode</button>
 <a href="settings.html" class="text-xs font-semibold bg-gray-100 dark:bg-gray-700 dark:text-white px-3 py-1.5 rounded-lg flex-1 text-center">Settings</a>
 </div>
 <div class="flex items-center gap-3 mb-3 px-1">
@@ -264,6 +265,17 @@ let transactions=[];
 let isPro=false;
 
 if(localStorage.getItem('sf_theme')==='dark') document.documentElement.classList.add('dark');
+
+function updateDarkModeBtn(){
+  const btn = document.getElementById('dark-mode-btn');
+  if(!btn) return;
+  if(document.documentElement.classList.contains('dark')) {
+    btn.textContent = '☀️ Light Mode';
+  } else {
+    btn.textContent = '🌙 Dark Mode';
+  }
+}
+
 function toggleDarkMode(){
   console.log('Toggle Dark Mode clicked. Current classList:', document.documentElement.className);
   if(document.documentElement.classList.contains('dark')){
@@ -273,7 +285,11 @@ function toggleDarkMode(){
     document.documentElement.classList.add('dark'); localStorage.setItem('sf_theme','dark');
     console.log('Theme changed to dark. Saved to localStorage.');
   }
+  updateDarkModeBtn();
 }
+
+// Call once on load after DOM is ready
+window.addEventListener('DOMContentLoaded', updateDarkModeBtn);
 
 function escHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
 function fmtRp(n){return'Rp'+n.toLocaleString('id-ID');}
