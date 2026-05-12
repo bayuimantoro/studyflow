@@ -82,6 +82,18 @@ Logout
 
 <main class="flex-1 overflow-y-auto p-5 md:p-8">
 
+<!-- Notification Permission Banner -->
+<div id="notif-banner" class="hidden max-w-5xl mb-5 bg-gradient-to-r from-primary-light to-blue-50 border border-primary/20 rounded-xl px-5 py-3.5 flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+<p class="text-sm text-gray-700">Aktifkan notifikasi untuk reminder tugas?</p>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<button onclick="dismissNotifBanner()" class="text-xs text-gray-400 hover:text-gray-600 transition px-2 py-1">Nanti</button>
+<button onclick="requestNotifPermission()" class="bg-primary hover:bg-primary-dark text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-sm">Izinkan</button>
+</div>
+</div>
+
 <!-- DASHBOARD SECTION -->
 <div id="sec-dashboard" class="section active max-w-5xl">
 <h1 class="text-2xl font-extrabold text-gray-950 mb-1" id="greeting">Selamat datang!</h1>
@@ -198,6 +210,7 @@ Logout
 <form id="task-form" class="space-y-4">
 <div><label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama tugas</label><input type="text" id="task-name" required placeholder="Contoh: Baca buku statistika" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm"></div>
 <div><label class="block text-sm font-semibold text-gray-700 mb-1.5">Kategori</label><select id="task-cat" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm"><option value="hari-ini">Hari Ini</option><option value="minggu-ini">Minggu Ini</option></select></div>
+<div><label class="block text-sm font-semibold text-gray-700 mb-1.5">Waktu pengingat <span class="font-normal text-gray-400">(opsional)</span></label><input type="time" id="task-reminder" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm"></div>
 <div class="flex gap-3 pt-2"><button type="button" onclick="closeModal('task-modal')" class="flex-1 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-500 hover:border-gray-300 transition">Batal</button><button type="submit" class="flex-1 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-semibold shadow-md shadow-primary/25 transition">Tambah</button></div>
 </form>
 </div>
@@ -339,12 +352,17 @@ document.getElementById('task-form').addEventListener('submit',async function(e)
 e.preventDefault();
 var name=document.getElementById('task-name').value.trim();
 var cat=document.getElementById('task-cat').value;
+var reminderTime=document.getElementById('task-reminder').value;
 if(!name||!currentUserId)return;
 var btn=this.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Menyimpan...';
 var{data,error}=await sb.from('tasks').insert({user_id:currentUserId,name:name,category:cat}).select().single();
-if(!error&&data){tasks.push(data);renderAllTasks();}
+if(!error&&data){
+tasks.push(data);renderAllTasks();
+if(reminderTime)scheduleReminder(data.id,name,reminderTime);
+}
 btn.disabled=false;btn.textContent='Tambah';
 document.getElementById('task-name').value='';
+document.getElementById('task-reminder').value='';
 closeModal('task-modal');
 });
 
@@ -488,6 +506,84 @@ alert('Pembayaran gagal. Silakan coba lagi.');
 alert('Gagal memulai pembayaran: '+err.message);
 }
 }
+
+// ══════════════════════════════
+// NOTIFICATIONS — Browser Push Reminders
+// ══════════════════════════════
+function checkNotifBanner(){
+if(!('Notification' in window))return;
+if(Notification.permission==='default' && !localStorage.getItem('sf_notif_dismissed')){
+document.getElementById('notif-banner').classList.remove('hidden');
+}
+}
+
+function requestNotifPermission(){
+Notification.requestPermission().then(function(perm){
+document.getElementById('notif-banner').classList.add('hidden');
+if(perm==='granted'){
+new Notification('StudyFlow Reminder 📚',{body:'Notifikasi aktif! Kamu akan mendapat reminder untuk setiap tugas.',icon:'https://lively-haupia-9e704f.netlify.app/favicon.ico'});
+}
+});
+}
+
+function dismissNotifBanner(){
+document.getElementById('notif-banner').classList.add('hidden');
+localStorage.setItem('sf_notif_dismissed','1');
+}
+
+function getReminders(){
+try{return JSON.parse(localStorage.getItem('sf_reminders')||'[]');}catch{return[];}
+}
+function saveReminders(arr){localStorage.setItem('sf_reminders',JSON.stringify(arr));}
+
+function scheduleReminder(taskId,taskName,timeStr){
+if(Notification.permission!=='granted')return;
+var now=new Date();
+var parts=timeStr.split(':');
+var target=new Date(now.getFullYear(),now.getMonth(),now.getDate(),parseInt(parts[0]),parseInt(parts[1]),0);
+if(target<=now)return; // already passed today
+var delay=target.getTime()-now.getTime();
+
+// Save to localStorage
+var reminders=getReminders();
+reminders.push({id:taskId,name:taskName,fireAt:target.getTime()});
+saveReminders(reminders);
+
+// Schedule
+setTimeout(function(){
+if(Notification.permission==='granted'){
+new Notification('StudyFlow Reminder 📚',{body:'Waktunya mengerjakan: '+taskName,icon:'https://lively-haupia-9e704f.netlify.app/favicon.ico',tag:'task-'+taskId});
+}
+// Remove from storage
+var r=getReminders().filter(function(x){return x.id!==taskId;});
+saveReminders(r);
+},delay);
+}
+
+function restoreReminders(){
+if(!('Notification' in window)||Notification.permission!=='granted')return;
+var now=Date.now();
+var reminders=getReminders();
+var remaining=[];
+reminders.forEach(function(r){
+if(r.fireAt>now){
+remaining.push(r);
+var delay=r.fireAt-now;
+setTimeout(function(){
+if(Notification.permission==='granted'){
+new Notification('StudyFlow Reminder 📚',{body:'Waktunya mengerjakan: '+r.name,icon:'https://lively-haupia-9e704f.netlify.app/favicon.ico',tag:'task-'+r.id});
+}
+var rr=getReminders().filter(function(x){return x.id!==r.id;});
+saveReminders(rr);
+},delay);
+}
+});
+saveReminders(remaining);
+}
+
+// Init notifications on page load
+checkNotifBanner();
+restoreReminders();
 </script>
 </body>
 </html>
