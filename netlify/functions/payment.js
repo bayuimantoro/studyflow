@@ -4,18 +4,50 @@ exports.handler = async (event) => {
   }
 
   const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY;
+  const SUPABASE_URL = process.env.SUPABASE_URL || 'https://vmullhzdnosjnnwgsang.supabase.co';
+  const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
   if (!MIDTRANS_SERVER_KEY) {
     return { statusCode: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Midtrans key not configured' }) };
   }
 
+  if (!SUPABASE_SERVICE_KEY) {
+    return { statusCode: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Supabase service key not configured' }) };
+  }
+
+  // Extract JWT from Authorization header
+  const authHeader = event.headers['authorization'] || event.headers['Authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { statusCode: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Missing or invalid Authorization header' }) };
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+
+  // Verify the JWT token via Supabase Auth API
   let user_id, email;
   try {
-    const body = JSON.parse(event.body);
-    user_id = body.user_id;
-    email = body.email;
-    if (!user_id || !email) throw new Error('Missing fields');
-  } catch {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid request. Required: user_id, email' }) };
+    const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'apikey': SUPABASE_SERVICE_KEY
+      }
+    });
+
+    if (!userRes.ok) {
+      console.error('Supabase auth verification failed:', userRes.status);
+      return { statusCode: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Invalid or expired token' }) };
+    }
+
+    const userData = await userRes.json();
+    user_id = userData.id;
+    email = userData.email;
+
+    if (!user_id || !email) {
+      return { statusCode: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Could not resolve user from token' }) };
+    }
+  } catch (err) {
+    console.error('Token verification error:', err);
+    return { statusCode: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Token verification failed' }) };
   }
 
   const order_id = 'SF-PRO-' + user_id.substring(0, 8) + '-' + Date.now();

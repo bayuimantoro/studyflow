@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upgrade ke Pro - StudyFlow</title>
     <meta name="description" content="Upgrade ke StudyFlow Pro untuk unlimited AI, export PDF, dan analisis mingguan.">
@@ -167,10 +168,11 @@
             var btn=document.getElementById('pay-btn');
             btn.disabled=true;btn.textContent='Memproses...';
             try{
+                var session=(await sb.auth.getSession()).data.session;
+                if(!session||!session.access_token){alert('Sesi login tidak valid. Silakan login ulang.');window.location.href='login.html';return;}
                 var res=await fetch('/api/payment',{
                     method:'POST',
-                    headers:{'Content-Type':'application/json'},
-                    body:JSON.stringify({user_id:currentUser.id,email:currentUser.email})
+                    headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token}
                 });
                 var data=await res.json();
                 if(data.error)throw new Error(data.error);

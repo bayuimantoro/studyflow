@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/png" href="favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - StudyFlow</title>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -294,16 +295,28 @@ window.addEventListener('DOMContentLoaded', updateDarkModeBtn);
 function escHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
 function fmtRp(n){return'Rp'+n.toLocaleString('id-ID');}
 
-// ── Query tracking (localStorage) ──
-function getQueryKey(){var d=new Date();return'sf_queries_'+d.getFullYear()+'_'+(d.getMonth()+1);}
-function getQueryCount(){return parseInt(localStorage.getItem(getQueryKey())||'0');}
-function incrementQueryCount(){var k=getQueryKey();var c=getQueryCount()+1;localStorage.setItem(k,c);return c;}
-function updateQueryCounter(){
+// ── Query tracking (server-side via Supabase) ──
+async function updateQueryCounter(){
 var el=document.getElementById('query-counter');
 if(isPro){el.textContent='Unlimited';el.classList.remove('bg-primary-light','text-primary');el.classList.add('bg-amber-100','text-amber-700');return;}
-var used=getQueryCount();var left=Math.max(0,5-used);
+try{
+var now=new Date();var currentMonth=now.getFullYear()+'-'+(now.getMonth()+1);
+var{data:profile}=await sb.from('profiles').select('query_count,query_month').eq('id',currentUserId).single();
+var used=0;
+if(profile&&profile.query_month===currentMonth){used=profile.query_count||0;}
 el.textContent=used+'/5 query';
-if(left===0){el.classList.remove('bg-primary-light','text-primary');el.classList.add('bg-red-50','text-red-500');}
+el.classList.remove('bg-red-50','text-red-500','bg-amber-100','text-amber-700');
+if(used>=5){el.classList.remove('bg-primary-light','text-primary');el.classList.add('bg-red-50','text-red-500');}
+else{el.classList.add('bg-primary-light','text-primary');}
+}catch(err){el.textContent='0/5 query';}
+}
+function updateQueryCounterUI(used){
+var el=document.getElementById('query-counter');
+if(isPro){el.textContent='Unlimited';return;}
+el.textContent=used+'/5 query';
+el.classList.remove('bg-red-50','text-red-500','bg-amber-100','text-amber-700');
+if(used>=5){el.classList.remove('bg-primary-light','text-primary');el.classList.add('bg-red-50','text-red-500');}
+else{el.classList.add('bg-primary-light','text-primary');}
 }
 
 // ── Auth check & data load ──
@@ -328,7 +341,7 @@ if(profile && profile.is_pro){
 applyProStatus();
 
 await Promise.all([loadTasks(),loadTransactions()]);
-updateQueryCounter();
+await updateQueryCounter();
 })();
 
 // ── Navigation ──
@@ -500,21 +513,13 @@ document.getElementById('dashboard-balance').textContent=fmtRp(inc-exp);
 }
 
 // ══════════════════════════════
-// AI CHAT — Groq via Netlify proxy (with query limits)
+// AI CHAT — Groq via Netlify proxy (server-side quota enforcement)
 // ══════════════════════════════
 document.getElementById('chat-form').addEventListener('submit',async function(e){
 e.preventDefault();
 const input=document.getElementById('chat-input');
 const msg=input.value.trim();
 if(!msg)return;
-
-// Check query limit for free users
-if(!isPro && getQueryCount()>=5){
-const area=document.getElementById('chat-area');
-area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">Kamu sudah mencapai batas 5 query gratis bulan ini. <a href="upgrade.html" class="text-primary font-bold underline">Upgrade ke Pro</a> untuk unlimited AI query!</div></div>';
-area.scrollTop=area.scrollHeight;
-return;
-}
 
 input.value='';
 const area=document.getElementById('chat-area');
@@ -524,14 +529,26 @@ const btn=document.getElementById('chat-btn');
 btn.disabled=true;btn.textContent='...';
 chatHistory.push({role:'user',content:msg});
 try{
-const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory})});
+// Get session token for server-side auth
+var session=(await sb.auth.getSession()).data.session;
+if(!session||!session.access_token){alert('Sesi login tidak valid. Silakan login ulang.');window.location.href='login.html';return;}
+const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({messages:chatHistory})});
 const data=await res.json();
+// Handle quota exceeded from server
+if(data.error==='quota_exceeded'){
+chatHistory.pop(); // remove the user message we just pushed
+area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">Kamu sudah mencapai batas 5 query gratis bulan ini. <a href="upgrade.html" class="text-primary font-bold underline">Upgrade ke Pro</a> untuk unlimited AI query!</div></div>';
+area.scrollTop=area.scrollHeight;
+if(data.used)updateQueryCounterUI(data.used);
+btn.disabled=false;btn.textContent='Kirim';
+return;
+}
 if(data.error)throw new Error(data.error);
 const reply=data.reply;
 chatHistory.push({role:'assistant',content:reply});
 area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">'+escHtml(reply)+'</div></div>';
-if(!isPro)incrementQueryCount();
-updateQueryCounter();
+// Update counter from server response
+if(typeof data.used==='number')updateQueryCounterUI(data.used);
 }catch(err){
 area.innerHTML+='<div class="flex"><div class="chat-bubble chat-ai">Gagal menghubungi AI. Coba lagi nanti.</div></div>';
 }
@@ -568,10 +585,12 @@ doc.save("Laporan_Keuangan_StudyFlow.pdf");
 async function startPayment(){
 if(!currentUserId)return;
 try{
+// Get the current session access token for server-side JWT verification
+var session=(await sb.auth.getSession()).data.session;
+if(!session||!session.access_token){alert('Sesi login tidak valid. Silakan login ulang.');window.location.href='login.html';return;}
 var res=await fetch('/api/payment',{
 method:'POST',
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify({user_id:currentUserId,email:currentUserEmail})
+headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token}
 });
 var data=await res.json();
 if(data.error)throw new Error(data.error);
